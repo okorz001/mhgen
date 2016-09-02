@@ -33,6 +33,7 @@ dependencies {
     compile "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
 
     runtime 'ch.qos.logback:logback-classic:1.1.7'
+    runtime 'org.xerial:sqlite-jdbc:3.8.11.2'
 
     jetty 'org.eclipse.jetty:jetty-runner:9.3.11.v20160721'
 
