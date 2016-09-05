@@ -68,7 +68,7 @@ task run(dependsOn: assemble, type: JavaExec) {
 
 task wrapper(type: Wrapper) {
     description = 'Bootstrap the gradlew scripts.'
-    gradleVersion = '3.0'
+    gradleVersion = '2.14.1'
 }
 
 // Ignore release candidates when searching for dependency updates.
