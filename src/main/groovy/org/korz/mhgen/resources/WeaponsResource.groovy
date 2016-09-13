@@ -1,6 +1,8 @@
 package org.korz.mhgen.resources
+
 import org.korz.mhgen.core.Db
 import org.korz.mhgen.models.Element
+import org.korz.mhgen.models.Sharpness
 import org.korz.mhgen.models.Weapon
 import org.korz.mhgen.models.WeaponType
 
@@ -23,9 +25,91 @@ import javax.ws.rs.core.MediaType
 @Slf4j
 class WeaponsResource {
     enum Sort {
-        ATTACK,
-        EFFECTIVE_ATTACK,
-        ELEMENT
+        RAW,
+        ELEMENT,
+        EFFECTIVE_RAW,
+        EFFECTIVE_ELEMENT
+    }
+
+    static class WeaponView {
+        Weapon weapon
+        int attackUp
+        int criticalUp
+        int elementUp
+        int sharpnessUp
+        boolean bludgeoner
+        boolean critBoost
+        boolean critElement
+
+        BigDecimal getRaw() {
+            def base = this.weapon.raw
+            if (this.attackUp) {
+                // S 10, M 15, L 20, XL 25
+                base += 5 * (this.attackUp + 1)
+            }
+            def affinity = this.weapon.affinity
+            if (this.criticalUp) {
+                // +1 10, +2 20, +3 30
+                affinity += this.criticalUp * 10
+            }
+            def crit = this.critBoost ? 0.40 : 0.25
+            def sharpness = this.weapon.sharpness ? bestSharpness(this.sharpness).raw : 1.0
+            return damage(base, affinity, crit, sharpness)
+        }
+
+        Map<Element, BigDecimal> getElements() {
+            this.weapon.elements.collectEntries(new LinkedHashMap()) { element, value ->
+                def base = value
+                if (this.weapon.elements.size() == 2) {
+                    // Dual Blades with two elements are effective half, since only one blade has each element
+                    base /= 2
+                }
+                if (this.elementUp) {
+                    // TODO: how much does Fire Atk +1, et al add?
+                }
+                def affinity = this.weapon.affinity
+                if (this.criticalUp) {
+                    // +1 10, +2 20, +3 30
+                    affinity += this.criticalUp * 10
+                }
+                def crit = this.critElement ? this.weapon.type.critElement : 0.0
+                def sharpness = this.weapon.sharpness ? bestSharpness(this.sharpness).element : 1.0
+                return [element, damage(base, affinity, crit, sharpness)]
+            }
+        }
+
+        Map<Sharpness, Integer> getSharpness() {
+            if (this.weapon.sharpness) {
+                return this.weapon.sharpness[this.sharpnessUp]
+            }
+            return null
+        }
+
+        private static Sharpness bestSharpness(Map<Sharpness, ?> sharpness) {
+            if (sharpness[Sharpness.WHITE]) {
+                return Sharpness.WHITE
+            }
+            else if (sharpness[Sharpness.BLUE]) {
+                return Sharpness.BLUE
+            }
+            else if (sharpness[Sharpness.GREEN]) {
+                return Sharpness.GREEN
+            }
+            else if (sharpness[Sharpness.YELLOW]) {
+                return Sharpness.YELLOW
+            }
+            else if (sharpness[Sharpness.ORANGE]) {
+                return Sharpness.ORANGE
+            }
+            return Sharpness.RED
+        }
+
+        private static BigDecimal damage(int base,
+                                         int affinity,
+                                         BigDecimal crit,
+                                         BigDecimal sharpness) {
+            return base * (1 + affinity / 100.0 * crit) * sharpness
+        }
     }
 
     List<Weapon> weapons = []
@@ -39,31 +123,59 @@ class WeaponsResource {
     }
 
     @GET
-    List<Weapon> get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
-                     @QueryParam('type') WeaponType type,
-                     @QueryParam('slots') @DefaultValue('0') int slots,
-                     @QueryParam('element') Element element,
-                     @QueryParam('sort') @DefaultValue('ATTACK') Sort sort) {
-        def count = 100
-        return this.weapons.findAll {
-            if (isFinal && !it.isFinal) return false
-            if (type && it.type != type) return false
-            if (it.slots < slots) return false
-            if (element && it.element != element && it.element2 != element) return false
-            return true
-        }.sort {
-            switch(sort) {
-                case Sort.ATTACK:
-                    return -it.attack
-                case Sort.EFFECTIVE_ATTACK:
-                    return -it.getEffectiveAttack()
-                case Sort.ELEMENT:
-                    def value = it.element2 == element ? it.elementAttack2 : it.elementAttack
-                    if (it.elementAttack2) value /= 2
-                    return -value
-            }
-        }.findAll {
-            count-- > 0
+    List get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
+             @QueryParam('type') WeaponType type,
+             @QueryParam('slots') int slots,
+             @QueryParam('element') Element element,
+             @QueryParam('sort') @DefaultValue('RAW') Sort sort,
+             // Skills which affect damage formula:
+             @QueryParam('attackUp') int attackUp,
+             @QueryParam('criticalUp') int criticalUp,
+             @QueryParam('elementUp') int elementUp,
+             @QueryParam('sharpnessUp') int sharpnessUp,
+             @QueryParam('bludgeoner') boolean bludgeoner,
+             @QueryParam('critBoost') boolean critBoost,
+             @QueryParam('critElement') boolean critElement) {
+        def weapons = this.weapons
+        // Filter global weapons
+        if (isFinal) {
+            weapons = weapons.findAll { it.isFinal }
         }
+        if (type) {
+            weapons = weapons.findAll { it.type == type }
+        }
+        if (slots) {
+            weapons = weapons.findAll { it.slots >= slots }
+        }
+        if (element) {
+            weapons = weapons.findAll { it.elements[element] }
+        }
+        // Transform global weapons to request scoped view
+        weapons = weapons.collect { new WeaponView(weapon: it,
+                                                   attackUp: attackUp,
+                                                   criticalUp: criticalUp,
+                                                   elementUp: elementUp,
+                                                   sharpnessUp: sharpnessUp,
+                                                   bludgeoner: bludgeoner,
+                                                   critBoost: critBoost,
+                                                   critElement: critElement) }
+        // Sort views
+        weapons = weapons.sort { WeaponView view ->
+            switch(sort) {
+                case Sort.RAW:
+                    return -view.weapon.raw
+                case Sort.ELEMENT:
+                    return -view.weapon.elements[element]
+                case Sort.EFFECTIVE_RAW:
+                    return -view.raw
+                case Sort.EFFECTIVE_ELEMENT:
+                    return -view.elements[element]
+            }
+        }
+        // Truncate views
+        def count = 100
+        weapons = weapons.findAll { count-- > 0 }
+        // Done!! TODO: render HTML template
+        return weapons
     }
 }

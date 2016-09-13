@@ -1,8 +1,8 @@
 package org.korz.mhgen.models
 
+//@CompileStatic
+//@Immutable
 class Weapon extends Item {
-    private static final BigDecimal CRITICAL_MODIFIER = 0.25\
-
     static WeaponType getType(String name) {
         return WeaponType.valueOf(name.toUpperCase().replace(' ', '_'))
     }
@@ -13,30 +13,45 @@ class Weapon extends Item {
         return Element.valueOf(name.toUpperCase())
     }
 
+    static Map<Sharpness, Integer> getSharpness(String value) {
+        if (!value) return null
+        def values = value.split('\\.').collect { it as int }
+        return Collections.unmodifiableMap([
+            (Sharpness.RED): values[0],
+            (Sharpness.ORANGE): values[1],
+            (Sharpness.YELLOW): values[2],
+            (Sharpness.GREEN): values[3],
+            (Sharpness.BLUE): values[4],
+            (Sharpness.WHITE): values[5],
+        ])
+    }
+
     boolean isFinal
     WeaponType type
     int slots
+    int raw
+    Map<Element, Integer> elements
     int affinity
-    int attack
-    Element element
-    int elementAttack
-    Element element2
-    int elementAttack2
+    List<Map<Sharpness, Integer>> sharpness
 
     Weapon(row) {
         super(row)
         this.isFinal = row.final
         this.type = getType(row.wtype)
         this.slots = row.num_slots
+        this.raw = row.attack
         this.affinity = row.affinity as int
-        this.attack = row.attack
-        this.element = getElement(row.element)
-        this.elementAttack = row.element_attack
-        this.element2 = getElement(row.element_2)
-        this.elementAttack2 = row.element_2_attack
-    }
 
-    BigDecimal getEffectiveAttack(int extraAffinity = 0) {
-        return this.attack * (100 + ((this.affinity + extraAffinity) * CRITICAL_MODIFIER)) / 100;
+        this.elements = new LinkedHashMap()
+        if (row.element) {
+            this.elements[getElement(row.element)] = row.element_attack
+            if (row.element_2) {
+                this.elements[getElement(row.element_2)] = row.element_2_attack
+            }
+        }
+
+        if (row.sharpness) {
+            this.sharpness = row.sharpness.split(' ').collect { String data -> getSharpness(data) }
+        }
     }
 }
