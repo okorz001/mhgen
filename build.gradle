@@ -71,6 +71,20 @@ task run(dependsOn: assemble, type: JavaExec) {
     args = ['--path', '/', war.archivePath]
 }
 
+task copyJetty(type: Copy) {
+    description = 'Copy Jetty runner into local directory for Heroku'
+    from configurations.jetty
+    into "${buildDir}/jetty"
+}
+
+task stage {
+    description = 'The build target used by Heroku'
+    dependsOn clean, build, copyJetty
+    // Make sure clean runs before build!!
+    tasks.findByName('build').mustRunAfter 'clean'
+    tasks.findByName('copyJetty').mustRunAfter 'clean'
+}
+
 task wrapper(type: Wrapper) {
     description = 'Bootstrap the gradlew scripts.'
     gradleVersion = '2.14.1'
