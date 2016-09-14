@@ -1,6 +1,7 @@
 package org.korz.mhgen.resources
 
 import org.korz.mhgen.core.Db
+import org.korz.mhgen.core.Templates
 import org.korz.mhgen.models.Element
 import org.korz.mhgen.models.Sharpness
 import org.korz.mhgen.models.Weapon
@@ -20,7 +21,7 @@ import javax.ws.rs.core.MediaType
 
 @CompileStatic
 @Path('/weapons')
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.TEXT_HTML)
 @Singleton
 @Slf4j
 class WeaponsResource {
@@ -113,17 +114,19 @@ class WeaponsResource {
     }
 
     List<Weapon> weapons = []
+    Templates templates
 
     @Inject
-    WeaponsResource(Db db) {
+    WeaponsResource(Db db, Templates templates) {
         db.sql.eachRow("select i.name, i.rarity, w.* from items i JOIN weapons w using (_id)") {
             this.weapons += new Weapon(it)
         }
         log.info("Loaded ${this.weapons.size()} weapons")
+        this.templates = templates
     }
 
     @GET
-    List get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
+    String get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
              @QueryParam('type') WeaponType type,
              @QueryParam('slots') int slots,
              @QueryParam('element') Element element,
@@ -175,7 +178,7 @@ class WeaponsResource {
         // Truncate views
         def count = 100
         weapons = weapons.findAll { count-- > 0 }
-        // Done!! TODO: render HTML template
-        return weapons
+        // Render template
+        return this.templates.renderPage('Weapons', 'weapons', [weapons: weapons])
     }
 }

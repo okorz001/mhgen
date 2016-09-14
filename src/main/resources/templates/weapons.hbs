@@ -1,0 +1,38 @@
+<table style="text-align: center">
+    <thead>
+    <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Slots</th>
+        <th>Raw</th>
+        <th>Element</th>
+        <th>Affinity</th>
+        <th>Sharpness</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each weapons}}
+        <tr>
+            <td><img src="{{weaponImage weapon.type}}" height="40"></td>
+            <td>{{weapon.name}}</td>
+            <td style="font-family: monospace">{{slots weapon.slots}}</td>
+            <td>{{weapon.raw}} ({{round raw}})</td>
+            <td>
+                {{#each elements as |v k|}}
+                    <img src="{{elementImage k}}" height="20"
+                         style="vertical-align: bottom">
+                    {{getKey weapon.elements k}} ({{round v}})<br>
+                {{/each}}
+            </td>
+            <td>{{weapon.affinity}}%</td>
+            <td>
+                {{#if sharpness}}
+                    {{sharpnessSvg sharpness
+                        red="#ff0000" orange="#ff9900" yellow="#ffff00"
+                        green="#00ff00" blue="#0000ff" white="#e6e6e6"}}
+                {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>

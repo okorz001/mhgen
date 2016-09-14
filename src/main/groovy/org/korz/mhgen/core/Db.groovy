@@ -9,7 +9,7 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class Db {
     final static Class DRIVER = JDBC
-    final static def URL = 'jdbc:sqlite::resource:org/korz/mhgen/mhgen.db'
+    final static def URL = 'jdbc:sqlite::resource:mhgen.db'
 
     Sql sql
 

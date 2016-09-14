@@ -1,4 +1,5 @@
 package org.korz.mhgen.core
+
 import org.glassfish.hk2.utilities.binding.AbstractBinder
 import org.glassfish.jersey.server.ResourceConfig
 
@@ -19,6 +20,7 @@ class App extends ResourceConfig {
             @Override
             protected void configure() {
                 this.bind(new Db()).to(Db)
+                this.bind(new Templates()).to(Templates)
                 log.info('Binder configured')
             }
         }
