@@ -33,6 +33,9 @@ class Weapon extends Item {
     Map<Element, Integer> elements
     int affinity
     List<Map<Sharpness, Integer>> sharpness
+    ShellType shellType
+    Integer shellLevel
+    PhialType phialType
 
     Weapon(row) {
         super(row)
@@ -52,6 +55,18 @@ class Weapon extends Item {
 
         if (row.sharpness) {
             this.sharpness = row.sharpness.split(' ').collect { String data -> getSharpness(data) }
+        }
+
+        if (row.shelling_type) {
+            def (type, level) = row.shelling_type.split(' ')
+            this.shellType = ShellType.valueOf(type.toUpperCase())
+            this.shellLevel = level as int
+        }
+
+        if (row.phial) {
+            def type = row.phial.toUpperCase()
+            if (type == 'EXAUST') type = 'EXHAUST'
+            this.phialType = PhialType.valueOf(type)
         }
     }
 }

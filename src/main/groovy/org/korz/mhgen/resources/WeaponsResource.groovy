@@ -1,14 +1,15 @@
 package org.korz.mhgen.resources
 
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.korz.mhgen.core.Db
 import org.korz.mhgen.core.Templates
 import org.korz.mhgen.models.Element
+import org.korz.mhgen.models.PhialType
 import org.korz.mhgen.models.Sharpness
+import org.korz.mhgen.models.ShellType
 import org.korz.mhgen.models.Weapon
 import org.korz.mhgen.models.WeaponType
-
-import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -127,18 +128,21 @@ class WeaponsResource {
 
     @GET
     String get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
-             @QueryParam('type') WeaponType type,
-             @QueryParam('slots') int slots,
-             @QueryParam('element') Element element,
-             @QueryParam('sort') @DefaultValue('RAW') Sort sort,
-             // Skills which affect damage formula:
-             @QueryParam('attackUp') int attackUp,
-             @QueryParam('criticalUp') int criticalUp,
-             @QueryParam('elementUp') int elementUp,
-             @QueryParam('sharpnessUp') int sharpnessUp,
-             @QueryParam('bludgeoner') boolean bludgeoner,
-             @QueryParam('critBoost') boolean critBoost,
-             @QueryParam('critElement') boolean critElement) {
+               @QueryParam('type') WeaponType type,
+               @QueryParam('slots') int slots,
+               @QueryParam('element') Element element,
+               @QueryParam('sort') @DefaultValue('RAW') Sort sort,
+               @QueryParam('shellType') ShellType shellType,
+               @QueryParam('shellLevel') int shellLevel,
+               @QueryParam('phialType') PhialType phialType,
+               // Skills which affect damage formula:
+               @QueryParam('attackUp') int attackUp,
+               @QueryParam('criticalUp') int criticalUp,
+               @QueryParam('elementUp') int elementUp,
+               @QueryParam('sharpnessUp') int sharpnessUp,
+               @QueryParam('bludgeoner') boolean bludgeoner,
+               @QueryParam('critBoost') boolean critBoost,
+               @QueryParam('critElement') boolean critElement) {
         def weapons = this.weapons
         // Filter global weapons
         if (isFinal) {
@@ -152,6 +156,15 @@ class WeaponsResource {
         }
         if (element) {
             weapons = weapons.findAll { it.elements[element] }
+        }
+        if (shellType) {
+            weapons = weapons.findAll { it.shellType == shellType }
+        }
+        if (shellLevel) {
+            weapons = weapons.findAll { it.shellLevel >= shellLevel }
+        }
+        if (phialType) {
+            weapons = weapons.findAll { it.phialType == phialType }
         }
         // Transform global weapons to request scoped view
         weapons = weapons.collect { new WeaponView(weapon: it,

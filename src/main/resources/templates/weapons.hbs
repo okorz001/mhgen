@@ -8,6 +8,7 @@
         <th>Element</th>
         <th>Affinity</th>
         <th>Sharpness</th>
+        <th>Other</th>
     </tr>
     </thead>
     <tbody>
@@ -30,6 +31,14 @@
                     {{sharpnessSvg sharpness
                         red="#ff0000" orange="#ff9900" yellow="#ffff00"
                         green="#00ff00" blue="#0000ff" white="#e6e6e6"}}
+                {{/if}}
+            </td>
+            <td>
+                {{#if weapon.shellType}}
+                    {{weapon.shellType}} {{weapon.shellLevel}}
+                {{/if}}
+                {{#if weapon.phialType}}
+                    {{weapon.phialType}}
                 {{/if}}
             </td>
         </tr>
