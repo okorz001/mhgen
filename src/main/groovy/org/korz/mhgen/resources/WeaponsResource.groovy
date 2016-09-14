@@ -49,6 +49,9 @@ class WeaponsResource {
                 // S 10, M 15, L 20, XL 25
                 base += 5 * (this.attackUp + 1)
             }
+            if (this.bludgeoner && this.weapon.sharpness) {
+                base += bestSharpness(this.sharpness).bludgeoner
+            }
             def affinity = this.weapon.affinity
             if (this.criticalUp) {
                 // +1 10, +2 20, +3 30
