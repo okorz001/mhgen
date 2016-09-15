@@ -1,5 +1,8 @@
 package org.korz.mhgen.models
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum Element {
     FIRE,
     WATER,

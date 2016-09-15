@@ -40,6 +40,11 @@
                 {{#if weapon.phialType}}
                     {{weapon.phialType}}
                 {{/if}}
+                {{#if weapon.charges}}
+                    {{#each weapon.charges}}
+                        {{type}} {{level}}<br>
+                    {{/each}}
+                {{/if}}
             </td>
         </tr>
     {{/each}}

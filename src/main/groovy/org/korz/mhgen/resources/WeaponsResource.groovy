@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.korz.mhgen.core.Db
 import org.korz.mhgen.core.Templates
+import org.korz.mhgen.models.ChargeType
 import org.korz.mhgen.models.Element
 import org.korz.mhgen.models.PhialType
 import org.korz.mhgen.models.Sharpness
@@ -138,6 +139,8 @@ class WeaponsResource {
                @QueryParam('shellType') ShellType shellType,
                @QueryParam('shellLevel') int shellLevel,
                @QueryParam('phialType') PhialType phialType,
+               @QueryParam('chargeType') ChargeType chargeType,
+               @QueryParam('chargeLevel') int chargeLevel,
                // Skills which affect damage formula:
                @QueryParam('attackUp') int attackUp,
                @QueryParam('criticalUp') int criticalUp,
@@ -168,6 +171,18 @@ class WeaponsResource {
         }
         if (phialType) {
             weapons = weapons.findAll { it.phialType == phialType }
+        }
+        if (chargeType || chargeLevel) {
+            weapons = weapons.findAll {
+                def charges = it.charges
+                if (chargeType) {
+                    charges = charges.findAll { it.type == chargeType }
+                }
+                if (chargeLevel) {
+                    charges = charges.findAll { (it.level as int) >= chargeLevel }
+                }
+                return charges
+            }
         }
         // Transform global weapons to request scoped view
         weapons = weapons.collect { new WeaponView(weapon: it,

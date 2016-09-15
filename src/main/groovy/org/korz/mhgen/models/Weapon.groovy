@@ -13,6 +13,10 @@ class Weapon extends Item {
         return Element.valueOf(name.toUpperCase())
     }
 
+    static ChargeType getCharge(String name) {
+        return ChargeType.valueOf(name.toUpperCase())
+    }
+
     static Map<Sharpness, Integer> getSharpness(String value) {
         if (!value) return null
         def values = value.split('\\.').collect { it as int }
@@ -36,6 +40,7 @@ class Weapon extends Item {
     ShellType shellType
     Integer shellLevel
     PhialType phialType
+    List<Map<String, ?>> charges
 
     Weapon(row) {
         super(row)
@@ -67,6 +72,13 @@ class Weapon extends Item {
             def type = row.phial.toUpperCase()
             if (type == 'EXAUST') type = 'EXHAUST'
             this.phialType = PhialType.valueOf(type)
+        }
+
+        if (row.charges) {
+            this.charges = row.charges.split('\\|').findAll { it != 'Rapid 0' }.collect {
+                def (type, level) = it.split(' ')
+                return [type: getCharge(type), level: level as int]
+            }
         }
     }
 }
