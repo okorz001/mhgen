@@ -135,7 +135,7 @@ class WeaponsResource {
                @QueryParam('type') WeaponType type,
                @QueryParam('slots') int slots,
                @QueryParam('element') Element element,
-               @QueryParam('sort') @DefaultValue('RAW') Sort sort,
+               @QueryParam('sort') @DefaultValue('EFFECTIVE_RAW') Sort sort,
                @QueryParam('shellType') ShellType shellType,
                @QueryParam('shellLevel') int shellLevel,
                @QueryParam('phialType') PhialType phialType,
