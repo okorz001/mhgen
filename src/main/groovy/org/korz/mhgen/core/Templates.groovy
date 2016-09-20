@@ -19,6 +19,13 @@ class Templates {
             .with(new ClassPathTemplateLoader(prefix: '/templates', suffix: '.hbs'))
             .with(new ConcurrentMapTemplateCache())
 
+        this.engine.registerHelper('displayName', { Object thing, Options opts ->
+            def x = thing.toString().split('_').collect { String it ->
+                "${it.charAt(0)}${it.substring(1).toLowerCase()}"
+            }.join(' ')
+            return x
+        })
+
         this.engine.registerHelper('getKey', { Map ctx, Options opts ->
             ctx[opts.param(0)]
         })

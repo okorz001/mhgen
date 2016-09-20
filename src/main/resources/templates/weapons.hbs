@@ -1,3 +1,18 @@
+<form method="get">
+    <select name="type">
+        {{#each types}}
+            <option value="{{this}}">{{displayName this}}</option>
+        {{/each}}
+    </select>
+    <select name="element">
+        <option value="">All</option>
+        {{#each elements}}
+            <option value="{{this}}">{{displayName this}}</option>
+        {{/each}}
+    </select>
+    <button type="submit">Update</button>
+</form>
+
 <table style="text-align: center">
     <thead>
     <tr>
