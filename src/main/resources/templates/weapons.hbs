@@ -13,7 +13,7 @@
     <button type="submit">Update</button>
 </form>
 
-<table style="text-align: center">
+<table id="weapons">
     <thead>
     <tr>
         <th>Type</th>
@@ -29,36 +29,38 @@
     <tbody>
     {{#each weapons}}
         <tr>
-            <td><img src="{{weaponImage weapon.type}}" height="40"></td>
-            <td>{{weapon.name}}</td>
-            <td style="font-family: monospace">{{slots weapon.slots}}</td>
-            <td>{{weapon.raw}} ({{round raw}})</td>
-            <td>
+            <td class="type"><img src="{{weaponImage weapon.type}}" height="40"></td>
+            <td class="name">{{weapon.name}}</td>
+            <td class="slots">{{slots weapon.slots}}</td>
+            <td class="raw">{{weapon.raw}} ({{round raw}})</td>
+            <td class="element">
                 {{#each elements as |v k|}}
                     <img src="{{elementImage k}}" height="20"
                          style="vertical-align: bottom">
                     {{getKey weapon.elements k}} ({{round v}})<br>
                 {{/each}}
             </td>
-            <td>{{weapon.affinity}}%</td>
-            <td>
+            <td class="affinity">{{weapon.affinity}}%</td>
+            <td class="sharpness">
                 {{#if sharpness}}
                     {{sharpnessSvg sharpness
-                        red="#ff0000" orange="#ff9900" yellow="#ffff00"
-                        green="#00ff00" blue="#0000ff" white="#e6e6e6"}}
+                    red="#ff0000" orange="#ff9900" yellow="#ffff00"
+                    green="#00ff00" blue="#0000ff" white="#e6e6e6"}}
                 {{/if}}
             </td>
-            <td>
+            <td class="other">
                 {{#if weapon.shellType}}
-                    {{weapon.shellType}} {{weapon.shellLevel}}
+                    <div>{{weapon.shellType}} {{weapon.shellLevel}}</div>
                 {{/if}}
                 {{#if weapon.phialType}}
-                    {{weapon.phialType}}
+                    <div>{{weapon.phialType}}</div>
                 {{/if}}
                 {{#if weapon.charges}}
-                    {{#each weapon.charges}}
-                        {{type}} {{level}}<br>
-                    {{/each}}
+                    <div>
+                        {{#each weapon.charges}}
+                            {{type}} {{level}}<br>
+                        {{/each}}
+                    </div>
                 {{/if}}
             </td>
         </tr>
