@@ -210,8 +210,10 @@ class WeaponsResource {
         def count = 100
         weapons = weapons.findAll { count-- > 0 }
         // Render template
+        /*
         return this.templates.renderPage('Weapons', 'weapons', [types: WeaponType.values(),
                                                                 elements: Element.values(),
                                                                 weapons: weapons])
+    */
     }
 }
