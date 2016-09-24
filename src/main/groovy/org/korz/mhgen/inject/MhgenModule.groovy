@@ -1,17 +1,17 @@
 package org.korz.mhgen.inject
 
-import com.google.common.reflect.ClassPath
 import com.google.inject.AbstractModule
+import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.korz.mhgen.core.Db
 
 @CompileStatic
 @Slf4j
 class MhgenModule extends AbstractModule{
     @Override
     protected void configure() {
-        def classloader = Thread.currentThread().contextClassLoader
-        bind(ClassPath).toInstance(ClassPath.from(classloader))
+        bind(Sql).toInstance(Db.sql)
         log.debug('Dependencies configured')
     }
 }

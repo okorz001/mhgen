@@ -3,7 +3,7 @@ package org.korz.mhgen.models
 import groovy.transform.CompileStatic
 
 @CompileStatic
-enum Element {
+enum ElementType {
     FIRE,
     WATER,
     THUNDER,
@@ -13,4 +13,8 @@ enum Element {
     PARALYSIS,
     SLEEP,
     BLAST
+
+    String getIcon() {
+        "/assets/elements/${toString().toLowerCase()}.png"
+    }
 }

@@ -5,9 +5,9 @@ import groovy.util.logging.Slf4j
 import org.korz.mhgen.core.Db
 import org.korz.mhgen.core.Templates
 import org.korz.mhgen.models.ChargeType
-import org.korz.mhgen.models.Element
+import org.korz.mhgen.models.ElementType
 import org.korz.mhgen.models.PhialType
-import org.korz.mhgen.models.Sharpness
+import org.korz.mhgen.models.SharpnessType
 import org.korz.mhgen.models.ShellType
 import org.korz.mhgen.models.Weapon
 import org.korz.mhgen.models.WeaponType
@@ -21,7 +21,7 @@ import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 
-@CompileStatic
+//@CompileStatic
 @Path('/weapons')
 @Produces(MediaType.TEXT_HTML)
 @Singleton
@@ -63,7 +63,7 @@ class WeaponsResource {
             return damage(base, affinity, crit, sharpness)
         }
 
-        Map<Element, BigDecimal> getElements() {
+        Map<ElementType, BigDecimal> getElements() {
             this.weapon.elements.collectEntries(new LinkedHashMap()) { element, value ->
                 def base = value
                 if (this.weapon.elements.size() == 2) {
@@ -84,30 +84,30 @@ class WeaponsResource {
             }
         }
 
-        Map<Sharpness, Integer> getSharpness() {
+        Map<SharpnessType, Integer> getSharpness() {
             if (this.weapon.sharpness) {
                 return this.weapon.sharpness[this.sharpnessUp]
             }
             return null
         }
 
-        private static Sharpness bestSharpness(Map<Sharpness, ?> sharpness) {
-            if (sharpness[Sharpness.WHITE]) {
-                return Sharpness.WHITE
+        private static SharpnessType bestSharpness(Map<SharpnessType, ?> sharpness) {
+            if (sharpness[SharpnessType.WHITE]) {
+                return SharpnessType.WHITE
             }
-            else if (sharpness[Sharpness.BLUE]) {
-                return Sharpness.BLUE
+            else if (sharpness[SharpnessType.BLUE]) {
+                return SharpnessType.BLUE
             }
-            else if (sharpness[Sharpness.GREEN]) {
-                return Sharpness.GREEN
+            else if (sharpness[SharpnessType.GREEN]) {
+                return SharpnessType.GREEN
             }
-            else if (sharpness[Sharpness.YELLOW]) {
-                return Sharpness.YELLOW
+            else if (sharpness[SharpnessType.YELLOW]) {
+                return SharpnessType.YELLOW
             }
-            else if (sharpness[Sharpness.ORANGE]) {
-                return Sharpness.ORANGE
+            else if (sharpness[SharpnessType.ORANGE]) {
+                return SharpnessType.ORANGE
             }
-            return Sharpness.RED
+            return SharpnessType.RED
         }
 
         private static BigDecimal damage(int base,
@@ -124,7 +124,7 @@ class WeaponsResource {
     @Inject
     WeaponsResource(Db db, Templates templates) {
         db.sql.eachRow("select i.name, i.rarity, w.* from items i JOIN weapons w using (_id)") {
-            this.weapons += new Weapon(it)
+            //this.weapons += new Weapon(it)
         }
         log.info("Loaded ${this.weapons.size()} weapons")
         this.templates = templates
@@ -134,7 +134,7 @@ class WeaponsResource {
     String get(@QueryParam('final') @DefaultValue('true') boolean isFinal,
                @QueryParam('type') WeaponType type,
                @QueryParam('slots') int slots,
-               @QueryParam('element') Element element,
+               @QueryParam('element') ElementType element,
                @QueryParam('sort') @DefaultValue('EFFECTIVE_RAW') Sort sort,
                @QueryParam('shellType') ShellType shellType,
                @QueryParam('shellLevel') int shellLevel,
@@ -212,7 +212,7 @@ class WeaponsResource {
         // Render template
         /*
         return this.templates.renderPage('Weapons', 'weapons', [types: WeaponType.values(),
-                                                                elements: Element.values(),
+                                                                elements: ElementType.values(),
                                                                 weapons: weapons])
     */
     }

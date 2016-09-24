@@ -20,4 +20,8 @@ enum WeaponType {
     SWORD_AND_SHIELD(critElement: 0.35)
 
     final BigDecimal critElement
+
+    String getIcon() {
+        "/assets/weapons/${toString().toLowerCase()}.png"
+    }
 }

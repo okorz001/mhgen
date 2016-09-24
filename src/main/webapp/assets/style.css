@@ -33,3 +33,47 @@ td.other div {
     display: inline-block;
     vertical-align: middle;
 }
+
+img.weapon {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}
+
+img.element {
+    width: 20px;
+    height: 20px;
+    vertical-align: bottom;
+}
+
+svg.sharpness {
+    border: 2px solid #000000;
+    min-width: 80px;
+    min-height: 20px;
+    vertical-align: middle;
+    background-color: #000000;
+}
+
+svg.sharpness rect.red {
+    fill: #ff0000;
+}
+
+svg.sharpness rect.orange {
+    fill: #ff9900;
+}
+
+svg.sharpness rect.yellow {
+    fill: #ffff00;
+}
+
+svg.sharpness rect.green {
+    fill: #00ff00;
+}
+
+svg.sharpness rect.blue {
+    fill: #0000ff;
+}
+
+svg.sharpness rect.white {
+    fill: #ffffff;
+}

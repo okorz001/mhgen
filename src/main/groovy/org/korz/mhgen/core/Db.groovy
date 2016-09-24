@@ -11,10 +11,8 @@ class Db {
     final static Class DRIVER = JDBC
     final static def URL = 'jdbc:sqlite::resource:mhgen.db'
 
-    Sql sql
-
-    Db() {
+    static Sql getSql() {
         log.info("Connecting to ${URL} with ${DRIVER}")
-        this.sql = Sql.newInstance(driver: DRIVER.canonicalName, url: URL)
+        return Sql.newInstance(driver: DRIVER.canonicalName, url: URL)
     }
 }

@@ -36,7 +36,8 @@ class Templates {
     @Inject
     Templates() {
         def loader = this.class.classLoader
-        def config = new TemplateConfiguration()
+        def config = new TemplateConfiguration(autoIndent: true,
+                                               autoNewLine: true)
         def resolver = new Resolver()
         engine = new MarkupTemplateEngine(loader, config, resolver)
 
