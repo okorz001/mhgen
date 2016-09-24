@@ -56,11 +56,11 @@ class ParamParserSpec extends Specification {
         'aLong'        | '7'   || 7
         'aLongBoxed'   | '8'   || 8
         'aBigInt'      | '9'   || 9
-        'aFloat'       | '0.5' || 0.5
-        'aFloatBoxed'  | '1.5' || 1.5
-        'aDouble'      | '2.5' || 2.5
-        'aDoubleBoxed' | '3.5' || 3.5
-        'aBigDecimal'  | '4.5' || 4.5
+        'aFloat'       | '0.1' || 0.1f
+        'aFloatBoxed'  | '1.1' || 1.1f
+        'aDouble'      | '2.1' || 2.1d
+        'aDoubleBoxed' | '3.1' || 3.1d
+        'aBigDecimal'  | '4.1' || 4.1
         'aChar'        | 'a'   || 'a' as char
         'aCharBoxed'   | 'b'   || 'b' as Character
         'aString'      | 'd'   || 'd'
@@ -79,7 +79,9 @@ class ParamParserSpec extends Specification {
 
         where:
         prop           | value
-        'unknownProp'  | 'zzz'
+        // Unknown parameter
+        'unknownParam' | 'zzz'
+        // Not a number
         'aByte'        | 'a'
         'aByteBoxed'   | 'b'
         'aShort'       | 'c'
@@ -94,8 +96,27 @@ class ParamParserSpec extends Specification {
         'aDouble'      | 'l'
         'aDoubleBoxed' | 'm'
         'aBigDecimal'  | 'n'
+        // Not a single character
         'aChar'        | 'aa'
         'aCharBoxed'   | 'ab'
+        // Unknown enum value
         'aEnum'        | 'FISH'
+        // Overflow
+        'aByte'        | '128'
+        'aByte'        | '-129'
+        'aByteBoxed'   | '128'
+        'aByteBoxed'   | '-129'
+        'aShort'       | '32768'
+        'aShort'       | '-32769'
+        'aShortBoxed'  | '32768'
+        'aShortBoxed'  | '-32769'
+        'aInt'         | '2147483648'
+        'aInt'         | '-2147483649'
+        'aIntBoxed'    | '2147483648'
+        'aIntBoxed'    | '-2147483649'
+        'aLong'        | '9223372036854775808'
+        'aLong'        | '-9223372036854775809'
+        'aLongBoxed'   | '9223372036854775808'
+        'aLongBoxed'   | '-9223372036854775809'
     }
 }

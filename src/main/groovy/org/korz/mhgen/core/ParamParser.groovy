@@ -1,7 +1,6 @@
 package org.korz.mhgen.core
 
 import com.google.common.primitives.Primitives
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -19,54 +18,54 @@ class ParamParser {
         // Make a copy so we can destroy it.
         params = new HashMap<String, String[]>(params)
         bean.metaPropertyValues
-            .findAll { it.name != 'class' }
-            .sort { it.name }
-            .each {
-                if (!params.containsKey(it.name)) {
-                    return
-                }
-
-                log.debug("${it.name} => ${it.type}")
-                // Box primitive types so they are easier to work with.
-                def type = Primitives.wrap(it.type)
-                // Consume the parameter so we can check for unknowns later.
-                def value = params.remove(it.name)[0]
-
-                if (Number.isAssignableFrom(type)) {
-                    log.debug("${it.name} is a number!")
-                    // TODO: check for overflow
-                    it.value = value as BigDecimal
-                }
-                else if (Character.isAssignableFrom(type)) {
-                    log.debug("${it.name} is a char!")
-                    if (value.size() > 1) {
-                        def msg = "Cannot parse param [${it.name}] of type " +
-                            "[${it.type}] from value [${value}]"
-                        throw new IllegalArgumentException(msg)
-                    }
-                    it.value = value[0]
-                }
-                else if (CharSequence.isAssignableFrom(type)) {
-                    log.debug("${it.name} is a string!")
-                    it.value = value
-                }
-                else if (Enum.isAssignableFrom(type)) {
-                    log.debug("${it.name} is an enum!")
-                    it.value = it.type.invokeMethod('valueOf', value)
-                }
-                else {
-                    def msg = "Cannot parse param [${it.name}] of type " +
-                        "[${it.type}]"
-                    throw new IllegalArgumentException(msg)
-                }
-            }
-
-        // Params are consumed when parsing, so any leftovers are unknown
+            // Only parse parameters that are present.
+            .findAll { params.containsKey(it.name) }
+            // Consume the parameter so we can check for unknowns later.
+            .each { parseParam(it, params.remove(it.name)[0]) }
+        // Leftover params are unknown.
         if (params) {
             def msg = "Unknown params: ${params.keySet}"
             throw new IllegalArgumentException(msg)
         }
-
         return bean
+    }
+
+    private static parseParam(PropertyValue prop, String value) {
+        log.debug("${prop.name} => ${prop.type}")
+        // Box primitive types so they are easier to work with.
+        def type = Primitives.wrap(prop.type)
+
+        if (Number.isAssignableFrom(type)) {
+            log.debug("${prop.name} is a number!")
+            prop.value = value as BigDecimal
+            if (prop.value as String != value) {
+                def msg = "Cannot parse param [${prop.name}] of type " +
+                    "[${prop.type}] from value [${value}]"
+                // TODO: we've already clobbered prop.value at this point
+                throw new IllegalArgumentException(msg)
+            }
+        }
+        else if (Character.isAssignableFrom(type)) {
+            log.debug("${prop.name} is a char!")
+            if (value.size() > 1) {
+                def msg = "Cannot parse param [${prop.name}] of type " +
+                    "[${prop.type}] from value [${value}]"
+                throw new IllegalArgumentException(msg)
+            }
+            prop.value = value[0]
+        }
+        else if (CharSequence.isAssignableFrom(type)) {
+            log.debug("${prop.name} is a string!")
+            prop.value = value
+        }
+        else if (Enum.isAssignableFrom(type)) {
+            log.debug("${prop.name} is an enum!")
+            prop.value = prop.type.invokeMethod('valueOf', value)
+        }
+        else {
+            def msg = "Cannot parse param [${prop.name}] of type " +
+                "[${prop.type}]"
+            throw new IllegalArgumentException(msg)
+        }
     }
 }
