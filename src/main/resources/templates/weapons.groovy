@@ -1,12 +1,42 @@
 import org.korz.mhgen.models.Weapon
+import org.korz.mhgen.models.WeaponType
+import org.korz.mhgen.servlets.WeaponsServlet
 
 modelTypes = {
+    WeaponsServlet.Params params
     List<Weapon> ws
+}
+
+def displayName(thing) {
+    thing.toString().split(/_/).collect { String it ->
+        it.substring(0, 1) + it.substring(1).toLowerCase()
+    }.join(' ')
 }
 
 layout 'layout', true,
     title: 'Weapons TEST',
     content: contents {
+        form(method: 'get') {
+            select(name: 'type') {
+                WeaponType.values().each {
+                    Map attrs = [value: it.toString()]
+                    if (it == params.type) {
+                        attrs.selected = 'selected'
+                    }
+                    option(attrs, displayName(it))
+                }
+            }
+            select(name: 'slots') {
+                [0, 1, 2, 3].each {
+                    Map attrs = [value: it.toString()]
+                    if (it == params.slots) {
+                        attrs.selected = 'selected'
+                    }
+                    option(attrs, it.toString())
+                }
+            }
+            button('Update', type: 'submit')
+        }
         table(id: 'weapons') {
             thead {
                 tr {

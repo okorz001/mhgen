@@ -20,8 +20,11 @@ class WeaponsServlet extends HttpServlet {
 
     static class Params {
         boolean isFinal = true
-        int slots
         WeaponType type
+        int slots
+
+        // Skills
+        int sharpnessUp
     }
 
     @Inject
@@ -47,7 +50,7 @@ class WeaponsServlet extends HttpServlet {
             results = results.findAll { it.slots >= params.slots }
         }
 
-        def context = [pjax: false, ws: results]
+        def context = [pjax: false, params: params, ws: results]
         templates.render('weapons', context, resp.writer)
     }
 }
