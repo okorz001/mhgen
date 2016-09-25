@@ -24,13 +24,18 @@ class ParamParser {
             .each { parseParam(it, params.remove(it.name)[0]) }
         // Leftover params are unknown.
         if (params) {
-            def msg = "Unknown params: ${params.keySet}"
+            def msg = "Unknown params: ${params.keySet()}"
             throw new IllegalArgumentException(msg)
         }
         return bean
     }
 
     private static parseParam(PropertyValue prop, String value) {
+        // Allow empty parameters.
+        if (!value) {
+            return
+        }
+
         log.debug("${prop.name} => ${prop.type}")
         // Box primitive types so they are easier to work with.
         def type = Primitives.wrap(prop.type)
@@ -60,7 +65,14 @@ class ParamParser {
         }
         else if (Enum.isAssignableFrom(type)) {
             log.debug("${prop.name} is an enum!")
-            prop.value = prop.type.invokeMethod('valueOf', value)
+            try {
+                prop.value = prop.type.invokeMethod('valueOf', value)
+            }
+            catch (e) {
+                def msg = "Cannot parse param [${prop.name}] of type " +
+                    "[${prop.type}] from value [${value}]"
+                throw new IllegalArgumentException(msg, e)
+            }
         }
         else {
             def msg = "Cannot parse param [${prop.name}] of type " +

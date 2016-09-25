@@ -4,6 +4,8 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.korz.mhgen.core.ParamParser
 import org.korz.mhgen.core.Templates
+import org.korz.mhgen.models.ElementType
+import org.korz.mhgen.models.PhialType
 import org.korz.mhgen.models.WeaponType
 import org.korz.mhgen.services.WeaponService
 
@@ -17,14 +19,24 @@ import javax.servlet.http.HttpServletResponse
 @Singleton
 @Slf4j
 class WeaponsServlet extends HttpServlet {
+    static enum Sort {
+        RAW,
+        ELEMENT,
+        EFFECTIVE_RAW,
+        EFFECTIVE_ELEMENT
+    }
 
     static class Params {
         boolean isFinal = true
-        WeaponType type
+        WeaponType weaponType
         int slots
+        ElementType elementType
+        PhialType phialType
 
         // Skills
         int sharpnessUp
+
+        Sort sort = Sort.RAW
     }
 
     @Inject
@@ -43,11 +55,26 @@ class WeaponsServlet extends HttpServlet {
         if (params.isFinal) {
             results = results.findAll { it.isFinal }
         }
-        if (params.type) {
-            results = results.findAll { it.type == params.type }
+        if (params.weaponType) {
+            results = results.findAll { it.type == params.weaponType }
         }
         if (params.slots) {
             results = results.findAll { it.slots >= params.slots }
+        }
+        if (params.elementType) {
+            results = results.findAll { it.elements[params.elementType] }
+        }
+        if (params.phialType) {
+            results = results.findAll { it.phialType == params.phialType }
+        }
+
+        results = results.sort {
+            switch (params.sort) {
+                case Sort.RAW:
+                    return -it.raw
+                case Sort.ELEMENT:
+                    return -it.elements[params.elementType]
+            }
         }
 
         def context = [pjax: false, params: params, ws: results]

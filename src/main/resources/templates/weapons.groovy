@@ -1,3 +1,4 @@
+import org.korz.mhgen.models.ElementType
 import org.korz.mhgen.models.Weapon
 import org.korz.mhgen.models.WeaponType
 import org.korz.mhgen.servlets.WeaponsServlet
@@ -17,10 +18,13 @@ layout 'layout', true,
     title: 'Weapons TEST',
     content: contents {
         form(method: 'get') {
-            select(name: 'type') {
+            select(name: 'weaponType') {
+                // Don't need to select this one since it's first anyway.
+                option(value: '', 'All')
+
                 WeaponType.values().each {
                     Map attrs = [value: it.toString()]
-                    if (it == params.type) {
+                    if (it == params.weaponType) {
                         attrs.selected = 'selected'
                     }
                     option(attrs, displayName(it))
@@ -30,6 +34,27 @@ layout 'layout', true,
                 [0, 1, 2, 3].each {
                     Map attrs = [value: it.toString()]
                     if (it == params.slots) {
+                        attrs.selected = 'selected'
+                    }
+                    option(attrs, it.toString())
+                }
+            }
+            select(name: 'elementType') {
+                // Don't need to select this one since it's first anyway.
+                option(value: '', 'All')
+
+                ElementType.values().each {
+                    Map attrs = [value: it.toString()]
+                    if (it == params.elementType) {
+                        attrs.selected = 'selected'
+                    }
+                    option(attrs, displayName(it))
+                }
+            }
+            select(name: 'sharpnessUp') {
+                [0, 1, 2].each {
+                    Map attrs = [value: it.toString()]
+                    if (it == params.sharpnessUp) {
                         attrs.selected = 'selected'
                     }
                     option(attrs, it.toString())
@@ -75,7 +100,7 @@ layout 'layout', true,
                             if (w.sharpnesses) {
                                 svg(class: 'sharpness', viewBox: '0 0 40 10') {
                                     def x = 0
-                                    w.sharpnesses[0].each {
+                                    w.sharpnesses[params.sharpnessUp].each {
                                         rect(class: it.key.toString().toLowerCase(),
                                              x: x,
                                              y: 0,
