@@ -7,7 +7,6 @@ import org.korz.mhgen.models.SharpnessType
 import org.korz.mhgen.models.Weapon
 
 import javax.inject.Singleton
-import java.math.MathContext
 import java.math.RoundingMode
 
 @CompileStatic
@@ -20,6 +19,9 @@ class DamageService {
 
     private static SharpnessType getMaxSharpness(Weapon weapon,
                                                  int sharpnessUp) {
+        if (!weapon.sharpnesses) {
+            return null
+        }
         def sharpness = weapon.sharpnesses[sharpnessUp]
         return sharpness.keySet().findAll { sharpness[it] }.max()
     }
@@ -51,7 +53,7 @@ class DamageService {
             crit += 0.15
         }
 
-        return calculateDamage(attack, affinity, crit, sharpness.raw)
+        return calculateDamage(attack, affinity, crit, sharpness?.raw)
     }
 
     BigDecimal getEffectiveElement(Weapon weapon,
@@ -75,7 +77,7 @@ class DamageService {
             crit += weapon.type.critElement
         }
 
-        return calculateDamage(attack, affinity, crit, sharpness.element)
+        return calculateDamage(attack, affinity, crit, sharpness?.element)
     }
 
     BigDecimal calculateDamage(int attack,
@@ -83,6 +85,6 @@ class DamageService {
                                BigDecimal critical,
                                BigDecimal sharpness) {
         def effectiveCrit = 1.0 + (affinity / 100) * critical
-        return round(attack * effectiveCrit * sharpness)
+        return round(attack * effectiveCrit * (sharpness ?: 1.0))
     }
 }
