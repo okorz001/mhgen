@@ -10,6 +10,15 @@ import javax.inject.Singleton
 @Singleton
 @Slf4j
 class ParamParser {
+    private static final Map BOOLEAN_VALUES = [
+        true: true,
+        t: true,
+        '1': true,
+        false: false,
+        f: false,
+        '0': false,
+    ]
+
     def <T> T parse(Map<String, String[]> params, Class<T> beanClass) {
         return parse(params, beanClass.newInstance())
     }
@@ -73,6 +82,16 @@ class ParamParser {
                     "[${prop.type}] from value [${value}]"
                 throw new IllegalArgumentException(msg, e)
             }
+        }
+        else if (Boolean.isAssignableFrom(type)) {
+            log.debug("${prop.name} is a boolean!")
+            value = value.toLowerCase()
+            if (!BOOLEAN_VALUES.containsKey(value)) {
+                def msg = "Cannot parse param [${prop.name}] of type " +
+                    "[${prop.type}] from value [${value}]"
+                throw new IllegalArgumentException(msg)
+            }
+            prop.value = BOOLEAN_VALUES[value]
         }
         else {
             def msg = "Cannot parse param [${prop.name}] of type " +

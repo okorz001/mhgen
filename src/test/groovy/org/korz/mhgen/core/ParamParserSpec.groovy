@@ -31,6 +31,8 @@ class ParamParserSpec extends Specification {
         Character aCharBoxed
         String aString
         Color aEnum
+        boolean aBoolean
+        Boolean aBooleanBoxed
     }
 
     def PARSER = new ParamParser()
@@ -46,25 +48,33 @@ class ParamParserSpec extends Specification {
         params.getProperty(prop) == expected
 
         where:
-        prop           | value || expected
-        'aByte'        | '1'   || 1
-        'aByteBoxed'   | '2'   || 2
-        'aShort'       | '3'   || 3
-        'aShortBoxed'  | '4'   || 4
-        'aInt'         | '5'   || 5
-        'aIntBoxed'    | '6'   || 6
-        'aLong'        | '7'   || 7
-        'aLongBoxed'   | '8'   || 8
-        'aBigInt'      | '9'   || 9
-        'aFloat'       | '0.1' || 0.1f
-        'aFloatBoxed'  | '1.1' || 1.1f
-        'aDouble'      | '2.1' || 2.1d
-        'aDoubleBoxed' | '3.1' || 3.1d
-        'aBigDecimal'  | '4.1' || 4.1
-        'aChar'        | 'a'   || 'a' as char
-        'aCharBoxed'   | 'b'   || 'b' as Character
-        'aString'      | 'd'   || 'd'
-        'aEnum'        | 'RED' || Color.RED
+        prop            | value   || expected
+        'aByte'         | '1'     || 1
+        'aByteBoxed'    | '2'     || 2
+        'aShort'        | '3'     || 3
+        'aShortBoxed'   | '4'     || 4
+        'aInt'          | '5'     || 5
+        'aIntBoxed'     | '6'     || 6
+        'aLong'         | '7'     || 7
+        'aLongBoxed'    | '8'     || 8
+        'aBigInt'       | '9'     || 9
+        'aFloat'        | '0.1'   || 0.1f
+        'aFloatBoxed'   | '1.1'   || 1.1f
+        'aDouble'       | '2.1'   || 2.1d
+        'aDoubleBoxed'  | '3.1'   || 3.1d
+        'aBigDecimal'   | '4.1'   || 4.1
+        'aChar'         | 'a'     || 'a' as char
+        'aCharBoxed'    | 'b'     || 'b' as Character
+        'aString'       | 'd'     || 'd'
+        'aEnum'         | 'RED'   || Color.RED
+        'aBoolean'      | 'true'  || true
+        'aBoolean'      | 'false' || false
+        'aBoolean'      | '1'     || true
+        'aBoolean'      | '0'     || false
+        'aBooleanBoxed' | 'true'  || true
+        'aBooleanBoxed' | 'false' || false
+        'aBooleanBoxed' | '1'     || true
+        'aBooleanBoxed' | '0'     || false
     }
 
     @Unroll
@@ -78,45 +88,48 @@ class ParamParserSpec extends Specification {
         thrown(IllegalArgumentException)
 
         where:
-        prop           | value
+        prop            | value
         // Unknown parameter
-        'unknownParam' | 'zzz'
+        'unknownParam'  | 'zzz'
         // Not a number
-        'aByte'        | 'a'
-        'aByteBoxed'   | 'b'
-        'aShort'       | 'c'
-        'aShortBoxed'  | 'd'
-        'aInt'         | 'e'
-        'aIntBoxed'    | 'f'
-        'aLong'        | 'g'
-        'aLongBoxed'   | 'h'
-        'aBigInt'      | 'i'
-        'aFloat'       | 'j'
-        'aFloatBoxed'  | 'k'
-        'aDouble'      | 'l'
-        'aDoubleBoxed' | 'm'
-        'aBigDecimal'  | 'n'
+        'aByte'         | 'a'
+        'aByteBoxed'    | 'b'
+        'aShort'        | 'c'
+        'aShortBoxed'   | 'd'
+        'aInt'          | 'e'
+        'aIntBoxed'     | 'f'
+        'aLong'         | 'g'
+        'aLongBoxed'    | 'h'
+        'aBigInt'       | 'i'
+        'aFloat'        | 'j'
+        'aFloatBoxed'   | 'k'
+        'aDouble'       | 'l'
+        'aDoubleBoxed'  | 'm'
+        'aBigDecimal'   | 'n'
         // Not a single character
-        'aChar'        | 'aa'
-        'aCharBoxed'   | 'ab'
+        'aChar'         | 'aa'
+        'aCharBoxed'    | 'ab'
         // Unknown enum value
-        'aEnum'        | 'FISH'
+        'aEnum'         | 'FISH'
         // Overflow
-        'aByte'        | '128'
-        'aByte'        | '-129'
-        'aByteBoxed'   | '128'
-        'aByteBoxed'   | '-129'
-        'aShort'       | '32768'
-        'aShort'       | '-32769'
-        'aShortBoxed'  | '32768'
-        'aShortBoxed'  | '-32769'
-        'aInt'         | '2147483648'
-        'aInt'         | '-2147483649'
-        'aIntBoxed'    | '2147483648'
-        'aIntBoxed'    | '-2147483649'
-        'aLong'        | '9223372036854775808'
-        'aLong'        | '-9223372036854775809'
-        'aLongBoxed'   | '9223372036854775808'
-        'aLongBoxed'   | '-9223372036854775809'
+        'aByte'         | '128'
+        'aByte'         | '-129'
+        'aByteBoxed'    | '128'
+        'aByteBoxed'    | '-129'
+        'aShort'        | '32768'
+        'aShort'        | '-32769'
+        'aShortBoxed'   | '32768'
+        'aShortBoxed'   | '-32769'
+        'aInt'          | '2147483648'
+        'aInt'          | '-2147483649'
+        'aIntBoxed'     | '2147483648'
+        'aIntBoxed'     | '-2147483649'
+        'aLong'         | '9223372036854775808'
+        'aLong'         | '-9223372036854775809'
+        'aLongBoxed'    | '9223372036854775808'
+        'aLongBoxed'    | '-9223372036854775809'
+        // Not a known value
+        'aBoolean'      | 'spam'
+        'aBooleanBoxed' | 'eggs'
     }
 }
