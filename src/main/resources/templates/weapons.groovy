@@ -1,11 +1,10 @@
 import org.korz.mhgen.models.ElementType
-import org.korz.mhgen.models.Weapon
 import org.korz.mhgen.models.WeaponType
 import org.korz.mhgen.servlets.WeaponsServlet
 
 modelTypes = {
     WeaponsServlet.Params params
-    List<Weapon> ws
+    List<WeaponsServlet.Result> results
 }
 
 def displayName(thing) {
@@ -76,7 +75,8 @@ layout 'layout', true,
                 }
             }
             tbody {
-                ws.each { Weapon w ->
+                results.each { WeaponsServlet.Result result ->
+                    def w = result.weapon
                     tr {
                         td {
                             img(class: 'weapon',
@@ -85,13 +85,13 @@ layout 'layout', true,
                         }
                         td(w.name)
                         td(w.slots)
-                        td(w.raw)
+                        td("${w.raw} (${result.raw})")
                         td {
-                            w.elements.each {
+                            w.elements.each { element, value ->
                                 img(class: 'element',
-                                    alt: it.key,
-                                    src: it.key.icon)
-                                yield it.value
+                                    alt: element,
+                                    src: element.icon)
+                                yield "${value} (${result.elements[element]})"
                                 br()
                             }
                         }

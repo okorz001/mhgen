@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 enum SharpnessType {
+    // This order is important so we can use the default enum comparator
     RED(raw: 0.50, element: 0.25, bludgeoner: 30),
     ORANGE(raw: 0.75, element: 0.50, bludgeoner: 30),
     YELLOW(raw: 1.0, element: 0.75, bludgeoner: 25),
