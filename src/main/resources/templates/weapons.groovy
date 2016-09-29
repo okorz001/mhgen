@@ -18,13 +18,60 @@ class Option {
     Object value
 }
 
-void createOptions(List<Option> values, Object selected = null) {
-    values.each {
-        Map attrs = [value: it.value ? it.value.toString(): '']
-        if (it.value == selected) {
-            attrs.selected = 'selected'
+void createSelect(String name,
+                  String title,
+                  List<Option> values,
+                  Object selected = null) {
+    div(class: 'field') {
+        label(title, for: name)
+        select(name: name) {
+            values.each {
+                Map attrs = [value: it.value ? it.value.toString(): '']
+                if (it.value == selected) {
+                    attrs.selected = 'selected'
+                }
+                option(attrs, it.name)
+            }
         }
-        option(attrs, it.name)
+    }
+}
+
+void createRadio(String name,
+                 String title,
+                 List<Option> values,
+                 Object selected = null) {
+    div(class: 'field') {
+        label(title, for: name)
+        div(class: 'radios') {
+            values.each {
+                Map attrs = [
+                    name: name,
+                    type: 'radio',
+                    value: it.value ? it.value.toString() : '',
+                ]
+                if (it.value == selected) {
+                    attrs.checked = 'checked'
+                }
+                input(attrs, it.name)
+            }
+        }
+    }
+}
+
+void createCheckbox(String name,
+                    String title,
+                    Object selected = null) {
+    div(class: 'field') {
+        label(title, for: name)
+        Map attrs = [
+            name: name,
+            type: 'checkbox',
+            value: '1',
+        ]
+        if (selected) {
+            attrs.checked = 'checked'
+        }
+        input(attrs)
     }
 }
 
@@ -32,51 +79,72 @@ layout 'layout', true,
     title: 'Weapons',
     content: contents {
         form(method: 'get') {
+            List<Option> options
             fieldset {
                 legend('Weapon Properties')
-                div(class: 'field') {
-                    label('Type:', for: 'weaponType')
-                    select(name: 'weaponType') {
-                        def options = [new Option(name: 'Any')]
-                        WeaponType.values().each {
-                            options << new Option(name: displayName(it),
-                                                  value: it)
-                        }
-                        createOptions(options, params.weaponType)
-                    }
+
+                options = [new Option(name: 'Any')]
+                WeaponType.values().each {
+                    options << new Option(name: displayName(it),
+                                          value: it)
                 }
-                div(class: 'field') {
-                    label('Element:', for: 'elementType')
-                    select(name: 'elementType') {
-                        def options = [new Option(name: 'Any')]
-                        ElementType.values().each {
-                            options << new Option(name: displayName(it),
-                                                  value: it)
-                        }
-                        createOptions(options, params.elementType)
-                    }
+                createSelect('weaponType',
+                             'Type:',
+                             options,
+                             params.weaponType)
+
+                options = [new Option(name: 'Any')]
+                ElementType.values().each {
+                    options << new Option(name: displayName(it),
+                                          value: it)
                 }
-                div(class: 'field') {
-                    label('Minimum Slots:', for: 'slots')
-                    select(name: 'slots') {
-                        def options = [0, 1, 2, 3].collect {
-                            new Option(name: it.toString(), value: it)
-                        }
-                        createOptions(options, params.slots)
-                    }
+                createSelect('elementType',
+                             'Element:',
+                             options,
+                             params.elementType)
+
+                options = [0, 1, 2, 3].collect {
+                    new Option(name: it.toString(), value: it)
                 }
+                createRadio('slots',
+                            'Minimum Slots:',
+                            options,
+                            params.slots)
             }
             fieldset {
                 legend('Armor Skills')
-                div(class: 'field') {
-                    label('Sharpness Up:', for: 'sharpnessUp')
-                    select(name: 'sharpnessUp') {
-                        def options = [0, 1, 2].collect {
-                            new Option(name: it.toString(), value: it)
-                        }
-                        createOptions(options, params.sharpnessUp)
-                    }
+
+                options = [0, 1, 2].collect {
+                    new Option(name: it.toString(), value: it)
                 }
+                createRadio('sharpnessUp',
+                            'Sharpness Up:',
+                            options,
+                            params.sharpnessUp)
+
+                options = [0, 1, 2, 3].collect {
+                    new Option(name: it.toString(), value: it)
+                }
+                createRadio('attackUp',
+                            'Attack Up:',
+                            options,
+                            params.attackUp)
+
+                options = [0, 1, 2, 3].collect {
+                    new Option(name: it.toString(), value: it)
+                }
+                createRadio('criticalUp',
+                            'Critical Up:',
+                            options,
+                            params.criticalUp)
+
+                createCheckbox('critBoost',
+                               'Critical Boost:',
+                               params.critBoost)
+
+                createCheckbox('critElement',
+                               'Critical Element:',
+                               params.critElement)
             }
             button('Update', type: 'submit')
         }
