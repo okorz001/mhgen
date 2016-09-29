@@ -7,10 +7,25 @@ modelTypes = {
     List<WeaponsServlet.Result> results
 }
 
-def displayName(thing) {
+String displayName(thing) {
     thing.toString().split(/_/).collect { String it ->
         it.substring(0, 1) + it.substring(1).toLowerCase()
     }.join(' ')
+}
+
+class Option {
+    String name
+    Object value
+}
+
+void createOptions(List<Option> values, Object selected = null) {
+    values.each {
+        Map attrs = [value: it.value ? it.value.toString(): '']
+        if (it.value == selected) {
+            attrs.selected = 'selected'
+        }
+        option(attrs, it.name)
+    }
 }
 
 layout 'layout', true,
@@ -18,46 +33,30 @@ layout 'layout', true,
     content: contents {
         form(method: 'get') {
             select(name: 'weaponType') {
-                // Don't need to select this one since it's first anyway.
-                option(value: '', 'All')
-
+                def options = [new Option(name: 'All')]
                 WeaponType.values().each {
-                    Map attrs = [value: it.toString()]
-                    if (it == params.weaponType) {
-                        attrs.selected = 'selected'
-                    }
-                    option(attrs, displayName(it))
+                    options << new Option(name: displayName(it), value: it)
                 }
+                createOptions(options, params.weaponType)
             }
             select(name: 'slots') {
-                [0, 1, 2, 3].each {
-                    Map attrs = [value: it.toString()]
-                    if (it == params.slots) {
-                        attrs.selected = 'selected'
-                    }
-                    option(attrs, it.toString())
+                def options = [0, 1, 2, 3].collect {
+                    new Option(name: it.toString(), value: it)
                 }
+                createOptions(options, params.slots)
             }
             select(name: 'elementType') {
-                // Don't need to select this one since it's first anyway.
-                option(value: '', 'All')
-
+                def options = [new Option(name: 'All')]
                 ElementType.values().each {
-                    Map attrs = [value: it.toString()]
-                    if (it == params.elementType) {
-                        attrs.selected = 'selected'
-                    }
-                    option(attrs, displayName(it))
+                    options << new Option(name: displayName(it), value: it)
                 }
+                createOptions(options, params.elementType)
             }
             select(name: 'sharpnessUp') {
-                [0, 1, 2].each {
-                    Map attrs = [value: it.toString()]
-                    if (it == params.sharpnessUp) {
-                        attrs.selected = 'selected'
-                    }
-                    option(attrs, it.toString())
+                def options = [0, 1, 2].collect {
+                    new Option(name: it.toString(), value: it)
                 }
+                createOptions(options, params.sharpnessUp)
             }
             button('Update', type: 'submit')
         }
