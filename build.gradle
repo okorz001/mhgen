@@ -13,7 +13,6 @@ ext {
     dependencyQualiferBlacklist = ['alpha', 'beta', 'rc', 'b', 'm', 'atlassian']
 
     guiceVersion = '4.1.0'
-    jerseyVersion = '2.23.2'
 }
 
 repositories {
@@ -31,10 +30,7 @@ dependencies {
     compile "com.google.guava:guava:19.0"
     compile "com.google.inject:guice:${guiceVersion}"
     compile "com.google.inject.extensions:guice-servlet:${guiceVersion}"
-    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
     compile 'org.codehaus.groovy:groovy-all:2.4.7:indy'
-    compile "org.glassfish.jersey.containers:jersey-container-servlet-core:${jerseyVersion}"
-    compile "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
     compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
 
