@@ -41,6 +41,8 @@ class WeaponsServlet extends HttpServlet {
         boolean critBoost
         boolean critElement
         int criticalUp
+        boolean elemental
+        int elementUp
         int sharpnessUp
 
         Sort sort = Sort.EFFECTIVE_RAW
@@ -96,7 +98,8 @@ class WeaponsServlet extends HttpServlet {
             weapon.elements.each {
                 def attack = damageService.getEffectiveElement(weapon,
                                                                it.key,
-                                                               params.attackUp,
+                                                               params.elementUp,
+                                                               params.elemental,
                                                                params.critElement,
                                                                params.criticalUp,
                                                                params.sharpnessUp)

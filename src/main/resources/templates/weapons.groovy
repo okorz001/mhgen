@@ -149,6 +149,18 @@ layout 'layout', true,
                 createCheckbox('critElement',
                                'Critical Element:',
                                params.critElement)
+
+                options = [0, 1, 2].collect {
+                    new Option(name: it.toString(), value: it)
+                }
+                createRadio('elementUp',
+                            'Element Up:',
+                            options,
+                            params.elementUp)
+
+                createCheckbox('elemental',
+                               'Elemental:',
+                               params.elemental)
             }
             button('Update', type: 'submit')
         }

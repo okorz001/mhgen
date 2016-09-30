@@ -16,6 +16,8 @@ class DamageService {
 
     static final int[] ATTACK_UP = [0, 10, 15, 20]
     static final int[] CRITICAL_UP = [0, 10, 20, 30]
+    static final int[] ELEMENT_UP = [0, 4, 6]
+    static final BigDecimal[] ELEMENT_UP_MODIFIER = [1.0, 1.05, 1.1]
 
     private static SharpnessType getMaxSharpness(Weapon weapon,
                                                  int sharpnessUp) {
@@ -54,18 +56,21 @@ class DamageService {
             crit += 0.15
         }
 
-        return calculateDamage(attack, affinity, crit, sharpness?.raw)
+        return calculateDamage(attack + 0.0, affinity, crit, sharpness?.raw)
     }
 
     BigDecimal getEffectiveElement(Weapon weapon,
                                    ElementType element,
-                                   int attackUp,
+                                   int elementUp,
+                                   boolean elemental,
                                    boolean critElement,
                                    int criticalUp,
                                    int sharpnessUp) {
         def sharpness = getMaxSharpness(weapon, sharpnessUp)
 
-        def attack = weapon.elements[element] + ATTACK_UP[attackUp]
+        def attack = weapon.elements[element] + ELEMENT_UP[elementUp]
+        // Fire Atk +1 and Element Atk Up bonuses are additive, not stacked
+        attack *= ELEMENT_UP_MODIFIER[elementUp] + (elemental ? 0.1 : 0.0)
 
         def affinity = weapon.affinity + CRITICAL_UP[criticalUp]
         if (affinity >= 10) {
@@ -81,7 +86,7 @@ class DamageService {
         return calculateDamage(attack, affinity, crit, sharpness?.element)
     }
 
-    BigDecimal calculateDamage(int attack,
+    BigDecimal calculateDamage(BigDecimal attack,
                                int affinity,
                                BigDecimal critical,
                                BigDecimal sharpness) {
