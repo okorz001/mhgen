@@ -40,7 +40,7 @@ class DamageService {
                                int sharpnessUp) {
         def sharpness = getMaxSharpness(weapon, sharpnessUp)
 
-        def attack = weapon.raw + ATTACK_UP[attackUp]
+        def attack = 0.0 + weapon.raw + ATTACK_UP[attackUp]
         if (bludgeoner && weapon.type.blademaster) {
             attack += sharpness.bludgeoner
         }
@@ -56,7 +56,7 @@ class DamageService {
             crit += 0.15
         }
 
-        return calculateDamage(attack + 0.0, affinity, crit, sharpness?.raw)
+        return calculateDamage(attack, affinity, crit, sharpness?.raw)
     }
 
     BigDecimal getEffectiveElement(Weapon weapon,
@@ -68,9 +68,12 @@ class DamageService {
                                    int sharpnessUp) {
         def sharpness = getMaxSharpness(weapon, sharpnessUp)
 
-        def attack = weapon.elements[element] + ELEMENT_UP[elementUp]
-        // Fire Atk +1 and Element Atk Up bonuses are additive, not stacked
-        attack *= ELEMENT_UP_MODIFIER[elementUp] + (elemental ? 0.1 : 0.0)
+        def attack = 0.0 + weapon.elements[element]
+        if (element.element) {
+            attack += ELEMENT_UP[elementUp]
+            // Fire Atk +1 and Element Atk Up bonuses are additive, not stacked
+            attack *= ELEMENT_UP_MODIFIER[elementUp] + (elemental ? 0.1 : 0.0)
+        }
 
         def affinity = weapon.affinity + CRITICAL_UP[criticalUp]
         if (affinity >= 10) {
@@ -80,7 +83,10 @@ class DamageService {
         // Critical Element does not affect negative affinity
         def crit = 0.0
         if (critElement && affinity > 0) {
-            crit += weapon.type.critElement
+            if (element.element) {
+                crit += weapon.type.critElement
+            }
+            // TODO: crit status modifiers?
         }
 
         return calculateDamage(attack, affinity, crit, sharpness?.element)
