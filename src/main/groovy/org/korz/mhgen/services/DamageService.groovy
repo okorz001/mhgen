@@ -32,13 +32,14 @@ class DamageService {
 
     BigDecimal getEffectiveRaw(Weapon weapon,
                                int attackUp,
+                               boolean bludgeoner,
                                boolean critBoost,
                                int criticalUp,
                                int sharpnessUp) {
         def sharpness = getMaxSharpness(weapon, sharpnessUp)
 
         def attack = weapon.raw + ATTACK_UP[attackUp]
-        if (weapon.type.blademaster) {
+        if (bludgeoner && weapon.type.blademaster) {
             attack += sharpness.bludgeoner
         }
 

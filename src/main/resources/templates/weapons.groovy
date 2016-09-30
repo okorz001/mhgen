@@ -130,6 +130,10 @@ layout 'layout', true,
                             options,
                             params.attackUp)
 
+                createCheckbox('bludgeoner',
+                               'Bludgeoner:',
+                               params.bludgeoner)
+
                 options = [0, 1, 2, 3].collect {
                     new Option(name: it.toString(), value: it)
                 }

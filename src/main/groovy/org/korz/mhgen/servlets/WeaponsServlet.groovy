@@ -37,6 +37,7 @@ class WeaponsServlet extends HttpServlet {
 
         // Skills
         int attackUp
+        boolean bludgeoner
         boolean critBoost
         boolean critElement
         int criticalUp
@@ -88,6 +89,7 @@ class WeaponsServlet extends HttpServlet {
             result.weapon = weapon
             result.raw = damageService.getEffectiveRaw(weapon,
                                                        params.attackUp,
+                                                       params.bludgeoner,
                                                        params.critBoost,
                                                        params.criticalUp,
                                                        params.sharpnessUp)
